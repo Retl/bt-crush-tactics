@@ -1,9 +1,80 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <meta charset="utf-8" />
-    </head>
-    <body>
-        <p>Hello World.</p>
-    </body>
+
+<head>
+    <meta charset="utf-8" />
+    
+</head>
+
+<body style="background-color:black;">
+    <p>Hello World.</p>
+    <canvas class="canvas-main" width="1136" height="112"></canvas>
+
+    <script>
+        // Prep the Bitmap Font
+        var gbFont = new Image;
+        gbFont.src = "img/GBStudioFontThick.png";
+        var canvasMain = document.querySelector(".canvas-main");
+        var canvasContext = canvasMain.getContext("2d");
+        
+        var bmpFontCharacterWidth = 8;
+        var bmpFontCharacterHeight = 8;
+        var bmpFontCharacterMappings = generateBitmapFontCharacterMapping();
+
+        function generateBitmapFontCharacterMapping() {
+            var mappings = {};
+            var mapString = " !\"#$%&\'()*+,-./"; 
+            mapString += "0123456789:;<=>?";
+            mapString += " ABCDEFGHIJKLMNO"; 
+            mapString += "PQRSTUVWXYZ[\\]^_";
+            mapString += "`abcdefghijklmno"; 
+            mapString += "pqrstuvwxyz{|}~ ";
+
+            var charInd = 0;
+            // We're only taking the first six columns.
+            for (var i = 0; i < 6; i++) {
+                // Horizontal loop to get all characters
+                for (var j = 0; j < 16; j++) {
+                    mappings[mapString[charInd]] = {
+                        "x": j * bmpFontCharacterWidth,
+                        "y": i * bmpFontCharacterHeight
+                    };
+                    charInd += 1;
+                }
+            }
+
+            return mappings;
+        }
+
+        function getBitmapChar(chr) {
+            var pos = { "x": 0, "y": 0 }; // This is an empty blank. Default to this for unknown characters.
+            if (bmpFontCharacterMappings.hasOwnProperty(chr)) { pos = bmpFontCharacterMappings[chr]; }
+            return pos;
+        }
+
+        function DrawStringToCanvasWithBitmapFont(str) {
+            var xOffset = 8;
+            var yOffset = 8;
+            var verticalSpacing = 2;
+            canvasContext.clearRect(0, 0, canvasMain.width, canvasMain.height);
+            var lines = str.split("\r\n");
+            for (var i = 0; i < lines.length; i++) {
+                for (var j = 0; j < lines[i].length; j++) {
+                    canvasContext.drawImage(gbFont,
+                        getBitmapChar(lines[i][j]).x,
+                        getBitmapChar(lines[i][j]).y,
+                        bmpFontCharacterWidth,
+                        bmpFontCharacterHeight,
+                        xOffset + (j * bmpFontCharacterWidth),
+                        yOffset + (i * (bmpFontCharacterHeight + verticalSpacing)),
+                        bmpFontCharacterWidth,
+                        bmpFontCharacterHeight);
+                }
+            }
+        }
+
+        DrawStringToCanvasWithBitmapFont("Current Objective: Survive 5 Turns.");
+    </script>
+</body>
+
 </html>
