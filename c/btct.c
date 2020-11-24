@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <SDL.h>
+#include <SDL_image.h>
 #include <emscripten.h>
 #include <stdlib.h>
 
@@ -55,11 +56,13 @@ int main()
     }
   }
 
-  //gScreenSurface = SDL_SetVideoMode(480, 270, 32, SDL_SWSURFACE);
-
+  //Load media
   loadedMedia = loadMedia();
   printf("loadMedia: %i\n", loadedMedia);
-  //Load media
+
+  // Init Gamepad
+  // https://davidgow.net/handmadepenguin/ch6.html
+  
 
   printf("Emscripten main loop should be set next.\n");
   emscripten_set_main_loop(update, 60, 1);
@@ -83,9 +86,9 @@ void update()
     }
     else
     {
-      //printf("Lol deleteme later - Actually, the draw should follow immediately after this.\n");
+      handleInput();
+      drawGameObjects();
       drawSplash();
-      //drawRandomPixels();
     }
     // printf("Frame Count: %i", frameCount);
   }
@@ -94,6 +97,11 @@ void update()
 void handleInput()
 {
 }
+
+void drawGameObjects()
+{
+}
+
 
 void drawRandomPixelsOld()
 {
@@ -187,7 +195,8 @@ int loadMedia()
 
   //Load splash image
   //gSplash = SDL_LoadBMP("img/bg_splashes/10_years_too_early.bmp");
-  gSplash = SDL_LoadBMP("img/temp/mock-vitals.bmp");
+  //gSplash = SDL_LoadBMP("img/temp/mock-vitals.bmp");
+  gSplash = IMG_Load("img/temp/mock-vitals.bmp");
   if (gSplash == NULL)
   {
     printf("Unable to load image %s! SDL Error: %s\n", "img/bg_splashes/10_years_too_early.bmp", SDL_GetError());

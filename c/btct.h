@@ -7,6 +7,7 @@ void handleInput();
 void drawRandomPixels();
 void drawRandomPixelsOld();
 void drawSplash();
+void drawGameObjects();
 int loadMedia();
 void quit();
 
