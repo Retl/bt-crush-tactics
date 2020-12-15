@@ -17,6 +17,7 @@ SDL_Renderer *gRenderer = NULL;
 SDL_Window *gWindow = NULL;
 SDL_Surface *gScreenSurface;
 SDL_Surface *gSplash;
+SDL_Surface *gCursor;
 
 SDL_Rect rect = {0, 0, 100, 100};
 
@@ -71,6 +72,7 @@ int main()
 
 void update()
 {
+  /*
   if (bQuit == 1)
   {
     //quit();
@@ -92,6 +94,7 @@ void update()
     }
     // printf("Frame Count: %i", frameCount);
   }
+  */
 }
 
 void handleInput()
@@ -152,22 +155,31 @@ void drawRandomPixels()
 
 void drawSplash()
 {
-  /*if (SDL_MUSTLOCK(gScreenSurface))
-    SDL_LockSurface(gScreenSurface);
 
-  Uint8 *pixels = gScreenSurface->pixels;
+  // This is the part that was yanked from the SDL1.2 sample I think?
+  if (SDL_MUSTLOCK(gScreenSurface)) SDL_LockSurface(gScreenSurface);
 
-  for (int i = 0; i < 1048576; i++)
-  {
-    char randomByte = rand() % 255;
-    pixels[i] = randomByte;
-  }
+  // BlitSurface is software based rendering and slow. When we RenderCopy to the renderer that is hardware accelerated and much faster.
+  // https://wiki.libsdl.org/SDL_BlitSurface
+  SDL_BlitSurface(gSplash, NULL, gScreenSurface, NULL);
+  //SDL_FillRect(gScreenSurface, (&rect), SDL_MapRGB(gScreenSurface->format, 0xAA, 0xAA, 0xAA));
+  SDL_UpdateWindowSurface( gWindow ); // Delete this??
+  
 
-  if (SDL_MUSTLOCK(gScreenSurface))
-    SDL_UnlockSurface(gScreenSurface);*/
+  SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, gScreenSurface);
 
-  //Apply the image
-  //printf("Drawing splash...!\n");
+  SDL_RenderClear(gRenderer);
+  // https://wiki.libsdl.org/SDL_RenderCopy
+  SDL_RenderCopy(gRenderer, screenTexture, NULL, NULL);
+  SDL_RenderPresent(gRenderer);
+
+  SDL_DestroyTexture(screenTexture);
+
+  //SDL_Flip(gScreenSurface);
+}
+
+void drawSplashOld()
+{
 
   // This is the part that was yanked from the SDL1.2 sample I think?
   if (SDL_MUSTLOCK(gScreenSurface)) SDL_LockSurface(gScreenSurface);
@@ -188,6 +200,44 @@ void drawSplash()
   //SDL_Flip(gScreenSurface);
 }
 
+void drawRenderScreen()
+{
+
+  // This is the part that was yanked from the SDL1.2 sample I think?
+  if (SDL_MUSTLOCK(gScreenSurface)) SDL_LockSurface(gScreenSurface);
+
+  //SDL_BlitSurface(gSplash, NULL, gScreenSurface, NULL);
+  SDL_UpdateWindowSurface( gWindow ); // Delete this??
+  
+
+  //SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, gScreenSurface);
+
+  SDL_RenderClear(gRenderer);
+  
+  
+  // SDL_RenderCopy(gRenderer, screenTexture, NULL, NULL);
+  /*
+  For the current Scene,
+  Draw the background object to the renderer.
+  Then get the Game Objects list. For every Game Object in the current room, get their current sprite and draw it to the renderer.
+  The Bitmap Font object might have some special behavior for its game object or something?
+  */
+
+  // As a temporary placeholder, we're going to draw the placeholder image and the cursor and move the cursor around a bit.
+  SDL_RenderCopy(gRenderer, screenTexture, NULL, NULL);
+  SDL_RenderCopy(gRenderer, screenTexture, NULL, NULL);
+  
+  SDL_RenderPresent(gRenderer);
+
+  SDL_DestroyTexture(screenTexture);
+}
+
+void blit(SDL_Texture* SrcBmp, SDL_Renderer* DstBmp, int SourceX, int SourceY, int DestX, int DestY, int Width, int Height) {
+    SDL_Rect Src = {SourceX, SourceY, Width, Height};
+    SDL_Rect Dst = {DestX, DestY, Width, Height};
+    SDL_RenderCopy(DstBmp,    SrcBmp, &Src, &Dst);
+}
+
 int loadMedia()
 {
   //Loading success flag
@@ -203,7 +253,19 @@ int loadMedia()
     success = 0;
   }
 
+    gCursor = IMG_Load("img/temp/MockCidle-32x32.png");
+  if (gCursor == NULL)
+  {
+    printf("Unable to load image %s! SDL Error: %s\n", "img/bg_splashes/10_years_too_early.bmp", SDL_GetError());
+    success = 0;
+  }
+
   return success;
+}
+
+void initTestRoomScenario()
+{
+
 }
 
 void quit()
