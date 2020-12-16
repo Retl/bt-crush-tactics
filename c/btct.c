@@ -24,7 +24,7 @@ SDL_Surface *gFont;
 SDL_Rect rect = {0, 0, 100, 100};
 
 void update()
-{  
+{
   if (bQuit == 1)
   {
     //quit();
@@ -47,7 +47,6 @@ void update()
     }
     // printf("Frame Count: %i", frameCount);
   }
-  
 }
 
 int main()
@@ -97,7 +96,7 @@ int main()
 
   // Init Gamepad
   // https://davidgow.net/handmadepenguin/ch6.html
-  
+
   return 0;
 }
 
@@ -107,62 +106,55 @@ void handleInput()
 
 void drawGameObjects()
 {
-  char testString[300] = "This is a test. Is it working? Oh, it works! @@NICE@@ \n But can it handle linebreaks...";
-  // char testString[300] = " !\"#$\%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"; 
+  // Keep this reference on string concatenation and copying on speed-dial. You'll need it a lot. http://www.cplusplus.com/reference/cstring/strncat/ 
+  
+  char displayStringAdvancing[3000] = ""; // We're going to use strncat to populate this.
+  char testString[300] = "This is a test.\nIs it working?\nOh, it works!\n@@NICE@@\nBut can it handle line-breaks...\n!\"#$\%&'()*+,-./\n0123456789:;<=>?\n@ABCDEFGHIJKLMNO\nPQRSTUVWXYZ[\\]^_\n`abcdefghijklmno\npqrstuvwxyz{|}~";
+  // char testString[300] = " !\"#$\%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
   int currentRow = 0;
   int currentCol = 0;
 
   // This is the part that was yanked from the SDL1.2 sample I think?
-    if (SDL_MUSTLOCK(gScreenSurface)) SDL_LockSurface(gScreenSurface);
+  if (SDL_MUSTLOCK(gScreenSurface))
+    SDL_LockSurface(gScreenSurface);
 
-    // BlitSurface is software based rendering and slow. When we RenderCopy to the renderer that is hardware accelerated and much faster.
-    // https://wiki.libsdl.org/SDL_BlitSurface
-    //SDL_BlitSurface(gSplash, NULL, gScreenSurface, NULL);
-    //SDL_FillRect(gScreenSurface, (&rect), SDL_MapRGB(gScreenSurface->format, 0xAA, 0xAA, 0xAA));
+  // BlitSurface is software based rendering and slow. When we RenderCopy to the renderer that is hardware accelerated and much faster.
+  // https://wiki.libsdl.org/SDL_BlitSurface
+  //SDL_BlitSurface(gSplash, NULL, gScreenSurface, NULL);
+  //SDL_FillRect(gScreenSurface, (&rect), SDL_MapRGB(gScreenSurface->format, 0xAA, 0xAA, 0xAA));
 
-    SDL_Texture *fontTexture = SDL_CreateTextureFromSurface(gRenderer, gFont);
-    SDL_UpdateWindowSurface( gWindow ); // Delete this??
+  SDL_Texture *fontTexture = SDL_CreateTextureFromSurface(gRenderer, gFont);
+  SDL_UpdateWindowSurface(gWindow); // Delete this??
 
-    //SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, gScreenSurface);
+  //SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, gScreenSurface);
 
-    //SDL_RenderClear(gRenderer);
+  SDL_RenderClear(gRenderer); // Comment this out if you want the backdrop to show.
 
-  /*char delim[10] = "\n";
-  char *ptr = strtok(str, delim);
+  char delim[10] = "\n";
+  char *ptr = strtok(strncat(displayStringAdvancing, testString, (frameCount % strlen(testString))), delim);
 
-	while(ptr != NULL)
-	{
-		printf("'%s'\n", ptr);
-		ptr = strtok(NULL, delim);
-	}*/
-
-  for (int i = 0; i < strlen(testString); i++) 
+  while (ptr != NULL)
   {
-    // https://www.codingame.com/playgrounds/14213/how-to-play-with-strings-in-c/string-split
-    // How to CORRECTLY do this newline split thing, if you want to figure it out.
-
-    SDL_Rect destination = {currentCol*8, currentRow*8, 8, 8};
-
-    
-    // https://wiki.libsdl.org/SDL_RenderCopy
-    SDL_Rect srcRect = getBitmapFontRectFromCharacter(testString[i]);
-    SDL_RenderCopy(gRenderer, fontTexture, &srcRect, &destination);
-
-    //printf("Character srcRect: %c - (%i, %i, %i, %i)\n", testString[i], srcRect.x, srcRect.y, srcRect.w, srcRect.h);
-    
-    currentCol += 1;
-    if (strcmp(&testString[i], "\n") == 0) 
+    for (int i = 0; i < strlen(ptr); i++)
     {
-      currentCol = 0;
-      currentRow += 1;
+
+      SDL_Rect destination = {currentCol * 8, currentRow * 8, 8, 8};
+      SDL_Rect srcRect = getBitmapFontRectFromCharacter(ptr[i]);
+      SDL_RenderCopy(gRenderer, fontTexture, &srcRect, &destination);
+
+      //printf("Character srcRect: %c - (%i, %i, %i, %i)\n", testString[i], srcRect.x, srcRect.y, srcRect.w, srcRect.h);
+
+      currentCol += 1;
     }
+    currentCol = 0;
+    currentRow += 1;
+    //printf("'%s'\n", ptr);
+    ptr = strtok(NULL, delim);
   }
   SDL_RenderPresent(gRenderer);
 
   SDL_DestroyTexture(fontTexture);
-
 }
-
 
 void drawRandomPixelsOld()
 {
@@ -215,14 +207,14 @@ void drawSplash()
 {
 
   // This is the part that was yanked from the SDL1.2 sample I think?
-  if (SDL_MUSTLOCK(gScreenSurface)) SDL_LockSurface(gScreenSurface);
+  if (SDL_MUSTLOCK(gScreenSurface))
+    SDL_LockSurface(gScreenSurface);
 
   // BlitSurface is software based rendering and slow. When we RenderCopy to the renderer that is hardware accelerated and much faster.
   // https://wiki.libsdl.org/SDL_BlitSurface
   SDL_BlitSurface(gSplash, NULL, gScreenSurface, NULL);
   //SDL_FillRect(gScreenSurface, (&rect), SDL_MapRGB(gScreenSurface->format, 0xAA, 0xAA, 0xAA));
-  SDL_UpdateWindowSurface( gWindow ); // Delete this??
-  
+  SDL_UpdateWindowSurface(gWindow); // Delete this??
 
   SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, gScreenSurface);
 
@@ -240,12 +232,12 @@ void drawSplashOld()
 {
 
   // This is the part that was yanked from the SDL1.2 sample I think?
-  if (SDL_MUSTLOCK(gScreenSurface)) SDL_LockSurface(gScreenSurface);
+  if (SDL_MUSTLOCK(gScreenSurface))
+    SDL_LockSurface(gScreenSurface);
 
   SDL_BlitSurface(gSplash, NULL, gScreenSurface, NULL);
   //SDL_FillRect(gScreenSurface, (&rect), SDL_MapRGB(gScreenSurface->format, 0xAA, 0xAA, 0xAA));
-  SDL_UpdateWindowSurface( gWindow ); // Delete this??
-  
+  SDL_UpdateWindowSurface(gWindow); // Delete this??
 
   SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, gScreenSurface);
 
@@ -262,17 +254,16 @@ void drawRenderScreen()
 {
 
   // This is the part that was yanked from the SDL1.2 sample I think?
-  if (SDL_MUSTLOCK(gScreenSurface)) SDL_LockSurface(gScreenSurface);
+  if (SDL_MUSTLOCK(gScreenSurface))
+    SDL_LockSurface(gScreenSurface);
 
   //SDL_BlitSurface(gSplash, NULL, gScreenSurface, NULL);
-  SDL_UpdateWindowSurface( gWindow ); // Delete this??
-  
+  SDL_UpdateWindowSurface(gWindow); // Delete this??
 
   SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, gScreenSurface);
 
   SDL_RenderClear(gRenderer);
-  
-  
+
   // SDL_RenderCopy(gRenderer, screenTexture, NULL, NULL);
   /*
   For the current Scene,
@@ -284,16 +275,17 @@ void drawRenderScreen()
   // As a temporary placeholder, we're going to draw the placeholder image and the cursor and move the cursor around a bit.
   SDL_RenderCopy(gRenderer, screenTexture, NULL, NULL);
   SDL_RenderCopy(gRenderer, screenTexture, NULL, NULL);
-  
+
   SDL_RenderPresent(gRenderer);
 
   SDL_DestroyTexture(screenTexture);
 }
 
-void blit(SDL_Texture* SrcBmp, SDL_Renderer* DstBmp, int SourceX, int SourceY, int DestX, int DestY, int Width, int Height) {
-    SDL_Rect Src = {SourceX, SourceY, Width, Height};
-    SDL_Rect Dst = {DestX, DestY, Width, Height};
-    SDL_RenderCopy(DstBmp,    SrcBmp, &Src, &Dst);
+void blit(SDL_Texture *SrcBmp, SDL_Renderer *DstBmp, int SourceX, int SourceY, int DestX, int DestY, int Width, int Height)
+{
+  SDL_Rect Src = {SourceX, SourceY, Width, Height};
+  SDL_Rect Dst = {DestX, DestY, Width, Height};
+  SDL_RenderCopy(DstBmp, SrcBmp, &Src, &Dst);
 }
 
 int loadMedia()
@@ -311,7 +303,7 @@ int loadMedia()
     success = 0;
   }
 
-    gCursor = IMG_Load("img/temp/MockCidle-32x32.png");
+  gCursor = IMG_Load("img/temp/MockCidle-32x32.png");
   if (gCursor == NULL)
   {
     printf("Unable to load image %s! SDL Error: %s\n", "img/bg_splashes/10_years_too_early.bmp", SDL_GetError());
@@ -330,7 +322,6 @@ int loadMedia()
 
 void initTestRoomScenario()
 {
-
 }
 
 void quit()
