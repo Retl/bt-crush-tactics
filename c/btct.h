@@ -1,6 +1,9 @@
 #ifndef BTCT_H
 #define BTCT_H
 
+#include <SDL.h>
+#include <SDL_image.h>
+
 int main();
 void update();
 void handleInput();

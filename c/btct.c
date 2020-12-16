@@ -21,6 +21,33 @@ SDL_Surface *gCursor;
 
 SDL_Rect rect = {0, 0, 100, 100};
 
+void update()
+{  
+  if (bQuit == 1)
+  {
+    //quit();
+  }
+  else
+  {
+    frameCount += 1;
+    printf("Frame Count: %i\r\n", frameCount);
+    //drawRandomPixels();
+    if (!loadedMedia)
+    {
+      printf("Failed to load media!\r\n");
+      bQuit = 1;
+    }
+    else
+    {
+      handleInput();
+      drawGameObjects();
+      drawSplash();
+    }
+    // printf("Frame Count: %i", frameCount);
+  }
+  
+}
+
 int main()
 {
   Map testMap;
@@ -40,6 +67,11 @@ int main()
     //Create window
     //gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
     //gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 480, 270, SDL_WINDOW_SHOWN );
+
+    printf("Emscripten main loop should be set next.\n");
+    emscripten_set_main_loop(update, 0, 0);
+    printf("Emscripten main loop should have been set before this.\n");
+
     SDL_CreateWindowAndRenderer(480, 270, 0, &gWindow, &gRenderer);
     printf("Created window...?.");
     if (gWindow == NULL)
@@ -64,37 +96,7 @@ int main()
   // Init Gamepad
   // https://davidgow.net/handmadepenguin/ch6.html
   
-
-  printf("Emscripten main loop should be set next.\n");
-  emscripten_set_main_loop(update, 60, 1);
   return 0;
-}
-
-void update()
-{
-  /*
-  if (bQuit == 1)
-  {
-    //quit();
-  }
-  else
-  {
-    frameCount += 1;
-    //drawRandomPixels();
-    if (!loadedMedia)
-    {
-      printf("Failed to load media!\n");
-      bQuit = 1;
-    }
-    else
-    {
-      handleInput();
-      drawGameObjects();
-      drawSplash();
-    }
-    // printf("Frame Count: %i", frameCount);
-  }
-  */
 }
 
 void handleInput()
@@ -210,7 +212,7 @@ void drawRenderScreen()
   SDL_UpdateWindowSurface( gWindow ); // Delete this??
   
 
-  //SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, gScreenSurface);
+  SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, gScreenSurface);
 
   SDL_RenderClear(gRenderer);
   
