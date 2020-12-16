@@ -1,6 +1,7 @@
 #include "sponsor.h"
 #include "map.h"
 #include "btct.h"
+#include "bitmap_font.h"
 
 #include <stdio.h>
 #include <SDL.h>
@@ -18,6 +19,7 @@ SDL_Window *gWindow = NULL;
 SDL_Surface *gScreenSurface;
 SDL_Surface *gSplash;
 SDL_Surface *gCursor;
+SDL_Surface *gFont;
 
 SDL_Rect rect = {0, 0, 100, 100};
 
@@ -40,8 +42,8 @@ void update()
     else
     {
       handleInput();
-      drawGameObjects();
       drawSplash();
+      drawGameObjects();
     }
     // printf("Frame Count: %i", frameCount);
   }
@@ -105,6 +107,60 @@ void handleInput()
 
 void drawGameObjects()
 {
+  char testString[300] = "This is a test. Is it working? Oh, it works! @@NICE@@ \n But can it handle linebreaks...";
+  // char testString[300] = " !\"#$\%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"; 
+  int currentRow = 0;
+  int currentCol = 0;
+
+  // This is the part that was yanked from the SDL1.2 sample I think?
+    if (SDL_MUSTLOCK(gScreenSurface)) SDL_LockSurface(gScreenSurface);
+
+    // BlitSurface is software based rendering and slow. When we RenderCopy to the renderer that is hardware accelerated and much faster.
+    // https://wiki.libsdl.org/SDL_BlitSurface
+    //SDL_BlitSurface(gSplash, NULL, gScreenSurface, NULL);
+    //SDL_FillRect(gScreenSurface, (&rect), SDL_MapRGB(gScreenSurface->format, 0xAA, 0xAA, 0xAA));
+
+    SDL_Texture *fontTexture = SDL_CreateTextureFromSurface(gRenderer, gFont);
+    SDL_UpdateWindowSurface( gWindow ); // Delete this??
+
+    //SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, gScreenSurface);
+
+    //SDL_RenderClear(gRenderer);
+
+  /*char delim[10] = "\n";
+  char *ptr = strtok(str, delim);
+
+	while(ptr != NULL)
+	{
+		printf("'%s'\n", ptr);
+		ptr = strtok(NULL, delim);
+	}*/
+
+  for (int i = 0; i < strlen(testString); i++) 
+  {
+    // https://www.codingame.com/playgrounds/14213/how-to-play-with-strings-in-c/string-split
+    // How to CORRECTLY do this newline split thing, if you want to figure it out.
+
+    SDL_Rect destination = {currentCol*8, currentRow*8, 8, 8};
+
+    
+    // https://wiki.libsdl.org/SDL_RenderCopy
+    SDL_Rect srcRect = getBitmapFontRectFromCharacter(testString[i]);
+    SDL_RenderCopy(gRenderer, fontTexture, &srcRect, &destination);
+
+    //printf("Character srcRect: %c - (%i, %i, %i, %i)\n", testString[i], srcRect.x, srcRect.y, srcRect.w, srcRect.h);
+    
+    currentCol += 1;
+    if (strcmp(&testString[i], "\n") == 0) 
+    {
+      currentCol = 0;
+      currentRow += 1;
+    }
+  }
+  SDL_RenderPresent(gRenderer);
+
+  SDL_DestroyTexture(fontTexture);
+
 }
 
 
@@ -259,6 +315,13 @@ int loadMedia()
   if (gCursor == NULL)
   {
     printf("Unable to load image %s! SDL Error: %s\n", "img/bg_splashes/10_years_too_early.bmp", SDL_GetError());
+    success = 0;
+  }
+
+  gFont = IMG_Load("img/GBStudioFontThick.png");
+  if (gFont == NULL)
+  {
+    printf("Unable to load image %s! SDL Error: %s\n", "img/GBStudioFontThick.png", SDL_GetError());
     success = 0;
   }
 
