@@ -73,7 +73,7 @@ int main()
     emscripten_set_main_loop(update, 0, 0);
     printf("Emscripten main loop should have been set before this.\n");
 
-    SDL_CreateWindowAndRenderer(480, 270, 0, &gWindow, &gRenderer);
+    SDL_CreateWindowAndRenderer(480, 270, 0, &gWindow, &gRenderer); // For 8x8 text characters, this is 60 x 33.75 = 1980
     printf("Created window...?.");
     if (gWindow == NULL)
     {
@@ -109,8 +109,10 @@ void drawGameObjects()
   // Keep this reference on string concatenation and copying on speed-dial. You'll need it a lot. http://www.cplusplus.com/reference/cstring/strncat/ 
   
   char displayStringAdvancing[3000] = ""; // We're going to use strncat to populate this.
-  char testString[300] = "This is a test.\nIs it working?\nOh, it works!\n@@NICE@@\nBut can it handle line-breaks...\n!\"#$\%&'()*+,-./\n0123456789:;<=>?\n@ABCDEFGHIJKLMNO\nPQRSTUVWXYZ[\\]^_\n`abcdefghijklmno\npqrstuvwxyz{|}~";
+  // char testString[300] = "This is a test.\nIs it working?\nOh, it works!\n@@NICE@@\nBut can it handle line-breaks...\n!\"#$\%&'()*+,-./\n0123456789:;<=>?\n@ABCDEFGHIJKLMNO\nPQRSTUVWXYZ[\\]^_\n`abcdefghijklmno\npqrstuvwxyz{|}~";
   // char testString[300] = " !\"#$\%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+  char testString[3000] = "As you make your way down the corridor, your foot loses grip.\nSuddenly you're tumbling- then rolling- down and down \ninto a dark abyss.\n \nAs you spiral down the incline, you feel the walls pull in \naround you until you're passing through \nwhat feels like a small tube. \n \nTHUMP! Ouch!\n \nYou stand and dust yourself. The room is dark. \nYour aura produces enough light \nto see a few feet in front of you and nothing more. \nThe path to the east seems short. Probably a wall? \nThere seems to be a corridor \nleading into more darkness to your left.\nThe platform beneath you \nmakes a gentle ceramic clink when kicked.\nSeems like it could move with some extra force.\nAbove you is the way you came. You can't go that way.\n \nSmall mechanical whirs from the darkness \nsuggest robots are nearby.\nNothing you haven't dealt with before...\nbut it's hard to fight what you can't see.\n \nExits: \nEast: (Too Dark To See)\nWest: (Too Dark To See)\nUp: Spiral Tumbler.\nDown: Rotating Barrier\n \n<10/14 HP - 069 C - 100/100 EN - (D.Boost) [Agile]>\n \n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ";
+
   int currentRow = 0;
   int currentCol = 0;
 
@@ -310,10 +312,10 @@ int loadMedia()
     success = 0;
   }
 
-  gFont = IMG_Load("img/GBStudioFontThick.png");
+  gFont = IMG_Load("img/font_fp.png");
   if (gFont == NULL)
   {
-    printf("Unable to load image %s! SDL Error: %s\n", "img/GBStudioFontThick.png", SDL_GetError());
+    printf("Unable to load image %s! SDL Error: %s\n", "img/font_fp.png", SDL_GetError());
     success = 0;
   }
 
