@@ -38,7 +38,7 @@ void mascot_cleanup_gamepad()
 
 void mascot_update_input_state()
 {
-    if (SDL_PollEvent(&e) != 0)
+    while (SDL_PollEvent(&e) != 0)
     {
         //User requests quit
         if (e.type == SDL_QUIT)
