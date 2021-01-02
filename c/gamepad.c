@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <stdio.h>
 #include "gamepad.h"
+#include "btct.h"
 
 //Analog joystick dead zone
 const int JOYSTICK_DEAD_ZONE = 8000;
@@ -92,7 +93,8 @@ void mascot_update_input_state()
                 }
             }
 
-            printf("Updated Thumbstick Position: (%d, %d)\n",xDir, yDir);
+            // printf("Updated Thumbstick Position: (%d, %d)\n",xDir, yDir);
+            setJoystickTilt(xDir, yDir);
         }
         else if (e.type == SDL_JOYBUTTONUP)
         {

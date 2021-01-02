@@ -8,6 +8,8 @@ int main();
 void update();
 void handleInput();
 
+void setJoystickTilt(int x, int y);
+
 void drawTextWithBitmapFont(int offsetX, int offsetY, char *ptr, char *delim, SDL_Renderer *gRenderer, SDL_Texture *fontTexture);
 void drawRandomPixels();
 void drawRandomPixelsOld();

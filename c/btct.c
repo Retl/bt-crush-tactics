@@ -15,6 +15,9 @@ int success = 1;
 int frameCount = 0;
 int loadedMedia = 0;
 
+int mascot_first_joystick_silt_horizontal = 0;
+int mascot_first_joystick_silt_vertical = 0;
+
 SDL_Renderer *gRenderer = NULL;
 SDL_Window *gWindow = NULL;
 SDL_Surface *gScreenSurface;
@@ -97,15 +100,22 @@ void handleInput()
   mascot_update_input_state();
 }
 
+void setJoystickTilt(int x, int y)
+{
+  mascot_first_joystick_silt_horizontal = x;
+  mascot_first_joystick_silt_vertical = y;
+}
+
 void drawGameObjects()
 {
-  // Keep this reference on string concatenation and copying on speed-dial. You'll need it a lot. http://www.cplusplus.com/reference/cstring/strncat/ 
-  
+  // Keep this reference on string concatenation and copying on speed-dial. You'll need it a lot. http://www.cplusplus.com/reference/cstring/strncat/
+
   char displayStringAdvancing[3000] = ""; // We're going to use strncat to populate this.
   // char roomDescString[300] = "This is a test.\nIs it working?\nOh, it works!\n@@NICE@@\nBut can it handle line-breaks...\n!\"#$\%&'()*+,-./\n0123456789:;<=>?\n@ABCDEFGHIJKLMNO\nPQRSTUVWXYZ[\\]^_\n`abcdefghijklmno\npqrstuvwxyz{|}~";
   // char roomDescString[300] = " !\"#$\%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
   char roomDescString[3000] = "As you make your way down the corridor, your foot loses grip.\nSuddenly you're tumbling- then rolling- down and down \ninto a dark abyss.\n \nAs you spiral down the incline, you feel the walls pull in \naround you until you're passing through \nwhat feels like a small tube. \n \nTHUMP! Ouch!\n \nYou stand and dust yourself. The room is dark. \nYour aura produces enough light \nto see a few feet in front of you and nothing more. \nThe path to the east seems short. Probably a wall? \nThere seems to be a corridor \nleading into more darkness to your left.\nThe platform beneath you \nmakes a gentle ceramic clink when kicked.\nSeems like it could move with some extra force.\nAbove you is the way you came. You can't go that way.\n \nSmall mechanical whirs from the darkness \nsuggest robots are nearby.\nNothing you haven't dealt with before...\nbut it's hard to fight what you can't see.\n \nExits: \nEast: (Too Dark To See)\nWest: (Too Dark To See)\nUp: Spiral Tumbler.\nDown: Rotating Barrier\n \n<10/14 HP - 069 C - 100/100 EN - (D.Boost) [Agile]>\n \n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ";
-  char debugNoteString[3000] = "Gamepad Stick Status: (%d, %d) - %ddeg";
+  char debugNoteString[3000] = "";
+  sprintf(&debugNoteString, "Gamepad Stick Status: (%d, %d) - \n", mascot_first_joystick_silt_horizontal, mascot_first_joystick_silt_vertical);
 
   // This is the part that was yanked from the SDL1.2 sample I think?
   if (SDL_MUSTLOCK(gScreenSurface))
@@ -127,23 +137,27 @@ void drawGameObjects()
   // We need thsoe substrings in the loop to know what row to draw the text on.
   char delim[10] = "\n";
   char *ptr = strtok(strncat(displayStringAdvancing, roomDescString, (frameCount % strlen(roomDescString))), delim);
+  // char *ptrDebugGamepad = strtok(debugNoteString, delim);
+  char *ptrDebugGamepad = debugNoteString;
 
-  
   drawTextWithBitmapFont(0, 0, ptr, delim, gRenderer, fontTexture);
+
+  // This is mostly here for debugging purpose to draw the gamepad status. Remove or make it a toggle option.
+  drawTextWithBitmapFont(560, 200, ptrDebugGamepad, delim, gRenderer, fontTexture);
 
   SDL_RenderPresent(gRenderer);
 
   SDL_DestroyTexture(fontTexture);
 }
 
-void drawTextWithBitmapFont(int offsetX, int offsetY, char *ptr, char *delim, SDL_Renderer *gRenderer, SDL_Texture *fontTexture) 
+void drawTextWithBitmapFont(int offsetX, int offsetY, char *ptr, char *delim, SDL_Renderer *gRenderer, SDL_Texture *fontTexture)
 {
   int currentRow = 0;
   int currentCol = 0;
   // For each substring the tokenizer has split for us...
   while (ptr != NULL)
   {
-      // For each character in the current substring...
+    // For each character in the current substring...
     for (int i = 0; i < strlen(ptr); i++)
     {
 
@@ -162,7 +176,6 @@ void drawTextWithBitmapFont(int offsetX, int offsetY, char *ptr, char *delim, SD
     //printf("'%s'\n", ptr);
     ptr = strtok(NULL, delim);
   }
-
 }
 
 void drawRandomPixelsOld()

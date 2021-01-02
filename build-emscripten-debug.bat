@@ -1,0 +1,1 @@
+ emcc ./c/btct.c c/map.c -g4 -o ./dist/btct.html --source-map-base --use-preload-plugins --preload-file img/bg_splashes
