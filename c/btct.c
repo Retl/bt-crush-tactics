@@ -2,6 +2,7 @@
 #include "map.h"
 #include "btct.h"
 #include "bitmap_font.h"
+#include "gamepad.h"
 
 #include <stdio.h>
 #include <SDL.h>
@@ -32,8 +33,7 @@ void update()
   else
   {
     frameCount += 1;
-    printf("Frame Count: %i\r\n", frameCount);
-    //drawRandomPixels();
+    //printf("Frame Count: %i\r\n", frameCount);
     if (!loadedMedia)
     {
       printf("Failed to load media!\r\n");
@@ -65,15 +65,10 @@ int main()
   }
   else
   {
-    //Create window
-    //gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
-    //gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 480, 270, SDL_WINDOW_SHOWN );
-
-    printf("Emscripten main loop should be set next.\n");
     emscripten_set_main_loop(update, 0, 0);
-    printf("Emscripten main loop should have been set before this.\n");
 
-    SDL_CreateWindowAndRenderer(480, 270, 0, &gWindow, &gRenderer); // For 8x8 text characters, this is 60 x 33.75 = 1980
+    // SDL_CreateWindowAndRenderer(480, 270, 0, &gWindow, &gRenderer); // For 8x8 text characters, this is 60 x 33.75 = 1980
+    SDL_CreateWindowAndRenderer(1080, 720, 0, &gWindow, &gRenderer); // For 8x8 text characters, 480x270px is 60 x 33.75 = 1980
     printf("Created window...?.");
     if (gWindow == NULL)
     {
@@ -82,10 +77,6 @@ int main()
     }
     else
     {
-      //Get window surface
-      //gScreenSurface = SDL_GetWindowSurface( gWindow );
-      //printf( "Got window surface.");
-
       gScreenSurface = SDL_CreateRGBSurface(0, 480, 270, 32, 0, 0, 0, 0);
     }
   }
@@ -96,12 +87,14 @@ int main()
 
   // Init Gamepad
   // https://davidgow.net/handmadepenguin/ch6.html
+  mascot_init_gamepad();
 
   return 0;
 }
 
 void handleInput()
 {
+  mascot_update_input_state();
 }
 
 void drawGameObjects()
@@ -109,9 +102,10 @@ void drawGameObjects()
   // Keep this reference on string concatenation and copying on speed-dial. You'll need it a lot. http://www.cplusplus.com/reference/cstring/strncat/ 
   
   char displayStringAdvancing[3000] = ""; // We're going to use strncat to populate this.
-  // char testString[300] = "This is a test.\nIs it working?\nOh, it works!\n@@NICE@@\nBut can it handle line-breaks...\n!\"#$\%&'()*+,-./\n0123456789:;<=>?\n@ABCDEFGHIJKLMNO\nPQRSTUVWXYZ[\\]^_\n`abcdefghijklmno\npqrstuvwxyz{|}~";
-  // char testString[300] = " !\"#$\%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-  char testString[3000] = "As you make your way down the corridor, your foot loses grip.\nSuddenly you're tumbling- then rolling- down and down \ninto a dark abyss.\n \nAs you spiral down the incline, you feel the walls pull in \naround you until you're passing through \nwhat feels like a small tube. \n \nTHUMP! Ouch!\n \nYou stand and dust yourself. The room is dark. \nYour aura produces enough light \nto see a few feet in front of you and nothing more. \nThe path to the east seems short. Probably a wall? \nThere seems to be a corridor \nleading into more darkness to your left.\nThe platform beneath you \nmakes a gentle ceramic clink when kicked.\nSeems like it could move with some extra force.\nAbove you is the way you came. You can't go that way.\n \nSmall mechanical whirs from the darkness \nsuggest robots are nearby.\nNothing you haven't dealt with before...\nbut it's hard to fight what you can't see.\n \nExits: \nEast: (Too Dark To See)\nWest: (Too Dark To See)\nUp: Spiral Tumbler.\nDown: Rotating Barrier\n \n<10/14 HP - 069 C - 100/100 EN - (D.Boost) [Agile]>\n \n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ";
+  // char roomDescString[300] = "This is a test.\nIs it working?\nOh, it works!\n@@NICE@@\nBut can it handle line-breaks...\n!\"#$\%&'()*+,-./\n0123456789:;<=>?\n@ABCDEFGHIJKLMNO\nPQRSTUVWXYZ[\\]^_\n`abcdefghijklmno\npqrstuvwxyz{|}~";
+  // char roomDescString[300] = " !\"#$\%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+  char roomDescString[3000] = "As you make your way down the corridor, your foot loses grip.\nSuddenly you're tumbling- then rolling- down and down \ninto a dark abyss.\n \nAs you spiral down the incline, you feel the walls pull in \naround you until you're passing through \nwhat feels like a small tube. \n \nTHUMP! Ouch!\n \nYou stand and dust yourself. The room is dark. \nYour aura produces enough light \nto see a few feet in front of you and nothing more. \nThe path to the east seems short. Probably a wall? \nThere seems to be a corridor \nleading into more darkness to your left.\nThe platform beneath you \nmakes a gentle ceramic clink when kicked.\nSeems like it could move with some extra force.\nAbove you is the way you came. You can't go that way.\n \nSmall mechanical whirs from the darkness \nsuggest robots are nearby.\nNothing you haven't dealt with before...\nbut it's hard to fight what you can't see.\n \nExits: \nEast: (Too Dark To See)\nWest: (Too Dark To See)\nUp: Spiral Tumbler.\nDown: Rotating Barrier\n \n<10/14 HP - 069 C - 100/100 EN - (D.Boost) [Agile]>\n \n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ";
+  char debugNoteString[3000] = "Gamepad Stick Status: (%d, %d) - %ddeg";
 
   int currentRow = 0;
   int currentCol = 0;
@@ -132,19 +126,25 @@ void drawGameObjects()
 
   SDL_RenderClear(gRenderer); // Comment this out if you want the backdrop to show.
 
+  // strtok basically means it's looking for that delimiter as a tokenizer, to split things into substrings.
+  // We need thsoe substrings in the loop to know what row to draw the text on.
   char delim[10] = "\n";
-  char *ptr = strtok(strncat(displayStringAdvancing, testString, (frameCount % strlen(testString))), delim);
+  char *ptr = strtok(strncat(displayStringAdvancing, roomDescString, (frameCount % strlen(roomDescString))), delim);
 
+  // For each substring the tokenizer has split for us...
   while (ptr != NULL)
   {
+      // For each character in the current substring...
     for (int i = 0; i < strlen(ptr); i++)
     {
 
+      // We're assuming your texture is from the renderer.
+      // The destination and source are for positioning the individual bitmap font characters.
       SDL_Rect destination = {currentCol * 8, currentRow * 8, 8, 8};
       SDL_Rect srcRect = getBitmapFontRectFromCharacter(ptr[i]);
       SDL_RenderCopy(gRenderer, fontTexture, &srcRect, &destination);
 
-      //printf("Character srcRect: %c - (%i, %i, %i, %i)\n", testString[i], srcRect.x, srcRect.y, srcRect.w, srcRect.h);
+      //printf("Character srcRect: %c - (%i, %i, %i, %i)\n", roomDescString[i], srcRect.x, srcRect.y, srcRect.w, srcRect.h);
 
       currentCol += 1;
     }
@@ -336,6 +336,7 @@ void quit()
   //SDL_DestroyWindow(gWindow);
   //gWindow = NULL;
 
+  mascot_cleanup_gamepad();
   //Quit SDL subsystems
   SDL_Quit();
 }
