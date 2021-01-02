@@ -107,9 +107,6 @@ void drawGameObjects()
   char roomDescString[3000] = "As you make your way down the corridor, your foot loses grip.\nSuddenly you're tumbling- then rolling- down and down \ninto a dark abyss.\n \nAs you spiral down the incline, you feel the walls pull in \naround you until you're passing through \nwhat feels like a small tube. \n \nTHUMP! Ouch!\n \nYou stand and dust yourself. The room is dark. \nYour aura produces enough light \nto see a few feet in front of you and nothing more. \nThe path to the east seems short. Probably a wall? \nThere seems to be a corridor \nleading into more darkness to your left.\nThe platform beneath you \nmakes a gentle ceramic clink when kicked.\nSeems like it could move with some extra force.\nAbove you is the way you came. You can't go that way.\n \nSmall mechanical whirs from the darkness \nsuggest robots are nearby.\nNothing you haven't dealt with before...\nbut it's hard to fight what you can't see.\n \nExits: \nEast: (Too Dark To See)\nWest: (Too Dark To See)\nUp: Spiral Tumbler.\nDown: Rotating Barrier\n \n<10/14 HP - 069 C - 100/100 EN - (D.Boost) [Agile]>\n \n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ";
   char debugNoteString[3000] = "Gamepad Stick Status: (%d, %d) - %ddeg";
 
-  int currentRow = 0;
-  int currentCol = 0;
-
   // This is the part that was yanked from the SDL1.2 sample I think?
   if (SDL_MUSTLOCK(gScreenSurface))
     SDL_LockSurface(gScreenSurface);
@@ -131,6 +128,18 @@ void drawGameObjects()
   char delim[10] = "\n";
   char *ptr = strtok(strncat(displayStringAdvancing, roomDescString, (frameCount % strlen(roomDescString))), delim);
 
+  
+  drawTextWithBitmapFont(0, 0, ptr, delim, gRenderer, fontTexture);
+
+  SDL_RenderPresent(gRenderer);
+
+  SDL_DestroyTexture(fontTexture);
+}
+
+void drawTextWithBitmapFont(int offsetX, int offsetY, char *ptr, char *delim, SDL_Renderer *gRenderer, SDL_Texture *fontTexture) 
+{
+  int currentRow = 0;
+  int currentCol = 0;
   // For each substring the tokenizer has split for us...
   while (ptr != NULL)
   {
@@ -140,7 +149,7 @@ void drawGameObjects()
 
       // We're assuming your texture is from the renderer.
       // The destination and source are for positioning the individual bitmap font characters.
-      SDL_Rect destination = {currentCol * 8, currentRow * 8, 8, 8};
+      SDL_Rect destination = {(currentCol * 8) + offsetX, (currentRow * 8) + offsetY, 8, 8};
       SDL_Rect srcRect = getBitmapFontRectFromCharacter(ptr[i]);
       SDL_RenderCopy(gRenderer, fontTexture, &srcRect, &destination);
 
@@ -153,9 +162,7 @@ void drawGameObjects()
     //printf("'%s'\n", ptr);
     ptr = strtok(NULL, delim);
   }
-  SDL_RenderPresent(gRenderer);
 
-  SDL_DestroyTexture(fontTexture);
 }
 
 void drawRandomPixelsOld()
