@@ -3,6 +3,13 @@
 
 typedef struct {
 	char displayName[200];
+    char textDesc[3000];
+
+    // Placeholdery. START FIXME
+    char textExits[3000];
+    char textContent[3000];
+    // Placeholdery. END FIXME
+
     int width;
     int height;
     int mapTiles[100][100];
@@ -16,5 +23,7 @@ typedef struct {
 void mapInit(Map *map);
 void mapFillFloor(Map *map, int floorLevel);
 void mapDebugPrint(Map *map);
+
+void mapSetSGRumbleRamble(Map *map);
 
 #endif

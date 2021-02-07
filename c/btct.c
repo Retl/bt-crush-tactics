@@ -18,6 +18,8 @@ int loadedMedia = 0;
 int mascot_first_joystick_silt_horizontal = 0;
 int mascot_first_joystick_silt_vertical = 0;
 
+Map testMap;
+
 SDL_Renderer *gRenderer = NULL;
 SDL_Window *gWindow = NULL;
 SDL_Surface *gScreenSurface;
@@ -54,8 +56,8 @@ void update()
 
 int main()
 {
-  Map testMap;
   mapInit(&testMap);
+  mapSetSGRumbleRamble(&testMap);
   mapDebugPrint(&testMap);
   printf("Filling the floor.\n");
   mapFillFloor(&testMap, 2);
@@ -80,7 +82,8 @@ int main()
     }
     else
     {
-      gScreenSurface = SDL_CreateRGBSurface(0, 480, 270, 32, 0, 0, 0, 0);
+      // This this ScreenSurface was a different size than the WindowRenderer, I got a huge zoomed in render. Experiment with it later.
+      gScreenSurface = SDL_CreateRGBSurface(0, 1080, 720, 32, 0, 0, 0, 0); // Resolution of this surface gets set here.
     }
   }
 
@@ -115,6 +118,8 @@ void drawGameObjects()
   // char roomDescString[300] = " !\"#$\%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
   char roomDescString[3000] = "As you make your way down the corridor, your foot loses grip.\nSuddenly you're tumbling- then rolling- down and down \ninto a dark abyss.\n \nAs you spiral down the incline, you feel the walls pull in \naround you until you're passing through \nwhat feels like a small tube. \n \nTHUMP! Ouch!\n \nYou stand and dust yourself. The room is dark. \nYour aura produces enough light \nto see a few feet in front of you and nothing more. \nThe path to the east seems short. Probably a wall? \nThere seems to be a corridor \nleading into more darkness to your left.\nThe platform beneath you \nmakes a gentle ceramic clink when kicked.\nSeems like it could move with some extra force.\nAbove you is the way you came. You can't go that way.\n \nSmall mechanical whirs from the darkness \nsuggest robots are nearby.\nNothing you haven't dealt with before...\nbut it's hard to fight what you can't see.\n \nExits: \nEast: (Too Dark To See)\nWest: (Too Dark To See)\nUp: Spiral Tumbler.\nDown: Rotating Barrier\n \n<10/14 HP - 069 C - 100/100 EN - (D.Boost) [Agile]>\n \n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ";
   char debugNoteString[3000] = "";
+  char roomTextConcatenated[10000] = "";
+  char mockPrompt[500] = "<Sparks (Leader) 0/1 * - 100 / 100 mp - 8 / 10 mv - 34 c - 69 pop>";
   sprintf(&debugNoteString, "Gamepad Stick Status: (%d, %d) - \n", mascot_first_joystick_silt_horizontal, mascot_first_joystick_silt_vertical);
 
   // This is the part that was yanked from the SDL1.2 sample I think?
@@ -131,7 +136,7 @@ void drawGameObjects()
 
   //SDL_Texture *screenTexture = SDL_CreateTextureFromSurface(gRenderer, gScreenSurface);
 
-  SDL_RenderClear(gRenderer); // Comment this out if you want the backdrop to show.
+  //SDL_RenderClear(gRenderer); // Comment this out if you want the backdrop to show.
 
   // strtok basically means it's looking for that delimiter as a tokenizer, to split things into substrings.
   // We need thsoe substrings in the loop to know what row to draw the text on.
@@ -140,10 +145,30 @@ void drawGameObjects()
   // char *ptrDebugGamepad = strtok(debugNoteString, delim);
   char *ptrDebugGamepad = debugNoteString;
 
-  drawTextWithBitmapFont(0, 0, ptr, delim, gRenderer, fontTexture);
+  // These are mostly here so I can draw some mockup stuff.
+  char *ptrStrPositionLeft = "640px";
+  char *ptrStrPositionRight = "960px";
+  char *ptrTIME = "TIME";
+
+  //drawTextWithBitmapFont(0, 0, ptr, delim, gRenderer, fontTexture);
 
   // This is mostly here for debugging purpose to draw the gamepad status. Remove or make it a toggle option.
-  drawTextWithBitmapFont(560, 200, ptrDebugGamepad, delim, gRenderer, fontTexture);
+  drawTextWithBitmapFont(560, 400, strtok(ptrDebugGamepad, delim), delim, gRenderer, fontTexture);
+
+  // Actually drawing that mockup stuff.
+  drawTextWithBitmapFont(560, 432, ptrStrPositionLeft, delim, gRenderer, fontTexture);
+  drawTextWithBitmapFont(560, 464, ptrStrPositionRight, delim, gRenderer, fontTexture);
+  drawTextWithBitmapFont(560, 496, ptrTIME, delim, gRenderer, fontTexture);
+
+  drawTextWithBitmapFont(12, 12, strtok(mockPrompt, delim), delim, gRenderer, fontTexture);
+  drawTextWithBitmapFont(12, 24, strtok("Time [==========--------------------------------------------------]", delim), delim, gRenderer, fontTexture);
+
+  strncat(roomTextConcatenated, testMap.displayName, strlen(testMap.displayName));
+  strncat(roomTextConcatenated, testMap.textDesc, strlen(testMap.textDesc));
+  strncat(roomTextConcatenated, testMap.textExits, strlen(testMap.textExits));
+  strncat(roomTextConcatenated, testMap.textContent, strlen(testMap.textContent));
+  drawTextWithBitmapFont(12, 290, strtok(roomTextConcatenated, delim), delim, gRenderer, fontTexture);
+  //drawTextWithBitmapFont(560, 328, "This\nIs\nA\nTest", delim, gRenderer, fontTexture);
 
   SDL_RenderPresent(gRenderer);
 
@@ -318,7 +343,9 @@ int loadMedia()
   //Load splash image
   //gSplash = SDL_LoadBMP("img/bg_splashes/10_years_too_early.bmp");
   //gSplash = SDL_LoadBMP("img/temp/mock-vitals.bmp");
-  gSplash = IMG_Load("img/temp/mock-vitals.bmp");
+
+  ///gSplash = IMG_Load("img/temp/mock-vitals.bmp");
+  gSplash = IMG_Load("img/bg_splashes/map_panels.png");
   if (gSplash == NULL)
   {
     printf("Unable to load image %s! SDL Error: %s\n", "img/bg_splashes/10_years_too_early.bmp", SDL_GetError());

@@ -16,6 +16,8 @@ int gamepad_quit = 0;
 int xDir = 0;
 int yDir = 0;
 
+GamepadStatus gamepadStatus;
+
 int mascot_init_gamepad()
 {
     int success = 1;
@@ -100,6 +102,10 @@ void mascot_update_input_state()
         {
             printf("Button released: %i\n", e.jbutton.button);
         }
+        else if (e.type == SDL_JOYBUTTONDOWN)
+        {
+            printf("Button pressed: %i\n", e.jbutton.button);
+        }
 
         //Calculate angle
         joystickAngle = atan2((double)yDir, (double)xDir) * (180.0 / M_PI);
@@ -129,4 +135,25 @@ void mascot_check_connections_gamepad()
             printf("Warning: Unable to open game controller! SDL Error: %s\n", SDL_GetError());
         }
     }
+}
+
+void mascot_clear_gamepad_status(GamepadStatus* gs)
+{
+    gs->connected = 0;
+    gs->dirHeldUp = 0;
+    gs->dirHeldDown = 0;
+    gs->dirHeldLeft = 0;
+    gs->dirHeldRight = 0;
+    gs->btnHeldSouth = 0;
+    gs->btnHeldEast = 0;
+}
+
+void mascot_update_gamepad_status(GamepadStatus* gs)
+{
+    if (gs->dirHeldUp > 0) {gs->dirHeldUp += 1;}
+    if (gs->dirHeldDown > 0) {gs->dirHeldDown += 1;}
+    if (gs->dirHeldLeft > 0) {gs->dirHeldLeft += 1;}
+    if (gs->dirHeldRight > 0) {gs->dirHeldRight += 1;}
+    if (gs->btnHeldSouth > 0) {gs->btnHeldSouth += 1;}
+    if (gs->btnHeldEast > 0) {gs->btnHeldEast += 1;}
 }
