@@ -20,7 +20,7 @@ typedef struct {
 	//TemporaryStatus tempStatuses[10];
 } Map;
 
-void mapInit(Map *map);
+void mapInit(Map *map, int width, int height);
 void mapFillFloor(Map *map, int floorLevel);
 void mapDebugPrint(Map *map);
 

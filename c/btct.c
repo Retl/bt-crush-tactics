@@ -56,7 +56,7 @@ void update()
 
 int main()
 {
-  mapInit(&testMap);
+  mapInit(&testMap, 100, 100);
   mapSetSGRumbleRamble(&testMap);
   mapDebugPrint(&testMap);
   printf("Filling the floor.\n");
@@ -119,7 +119,12 @@ void drawGameObjects()
   char roomDescString[3000] = "As you make your way down the corridor, your foot loses grip.\nSuddenly you're tumbling- then rolling- down and down \ninto a dark abyss.\n \nAs you spiral down the incline, you feel the walls pull in \naround you until you're passing through \nwhat feels like a small tube. \n \nTHUMP! Ouch!\n \nYou stand and dust yourself. The room is dark. \nYour aura produces enough light \nto see a few feet in front of you and nothing more. \nThe path to the east seems short. Probably a wall? \nThere seems to be a corridor \nleading into more darkness to your left.\nThe platform beneath you \nmakes a gentle ceramic clink when kicked.\nSeems like it could move with some extra force.\nAbove you is the way you came. You can't go that way.\n \nSmall mechanical whirs from the darkness \nsuggest robots are nearby.\nNothing you haven't dealt with before...\nbut it's hard to fight what you can't see.\n \nExits: \nEast: (Too Dark To See)\nWest: (Too Dark To See)\nUp: Spiral Tumbler.\nDown: Rotating Barrier\n \n<10/14 HP - 069 C - 100/100 EN - (D.Boost) [Agile]>\n \n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ";
   char debugNoteString[3000] = "";
   char roomTextConcatenated[10000] = "";
-  char mockPrompt[500] = "<Sparks (Leader) 0/1 * - 100 / 100 mp - 8 / 10 mv - 34 c - 69 pop>";
+  char mockPrompt[500] = "<NB BITTY (Leader) 2 / 7 * - 100 / 100 mp - 15 / 20 mv - 34 c - 20 pop>\n"
+                          "<H4X 3 / 6 * - 4 / 34 mp - 15 / 20 mv - 400 c - 33 pop>\n"
+                          "Objective: Locate and visit the Crush Queens arena.\n"
+                          "Objective: Reach 100 total popularity before Day 30.\n \n"
+                          "<Cassie (Leader) 2 / 6 * - - / - mp - 48 / 50 mv - 256 c - 70 pop>\n";
+  char mockHazardDetails[500] = "Mrs. Zhlayer \n0/14 * - 100 / 100 mp \nAction: Laser Recharge \nPosture: Standing \nDistance: 512 px \n\nTitle: Combat Tutor \nCanon: Mascots Aplenty! \n  Sub-Canon: - \nNotoriety: 4444 \nPopularity: -";
   sprintf(&debugNoteString, "Gamepad Stick Status: (%d, %d) - \n", mascot_first_joystick_silt_horizontal, mascot_first_joystick_silt_vertical);
 
   // This is the part that was yanked from the SDL1.2 sample I think?
@@ -148,7 +153,7 @@ void drawGameObjects()
   // These are mostly here so I can draw some mockup stuff.
   char *ptrStrPositionLeft = "640px";
   char *ptrStrPositionRight = "960px";
-  char *ptrTIME = "TIME";
+  char *ptrTIME = "^  v  YOU  128 256 384 512 640 768";
 
   //drawTextWithBitmapFont(0, 0, ptr, delim, gRenderer, fontTexture);
 
@@ -160,8 +165,10 @@ void drawGameObjects()
   drawTextWithBitmapFont(560, 464, ptrStrPositionRight, delim, gRenderer, fontTexture);
   drawTextWithBitmapFont(560, 496, ptrTIME, delim, gRenderer, fontTexture);
 
-  drawTextWithBitmapFont(12, 12, strtok(mockPrompt, delim), delim, gRenderer, fontTexture);
-  drawTextWithBitmapFont(12, 24, strtok("Time [==========--------------------------------------------------]", delim), delim, gRenderer, fontTexture);
+  drawTextWithBitmapFont(12, 12, strtok("Time [==========--------------------------------------------------]", delim), delim, gRenderer, fontTexture);
+  drawTextWithBitmapFont(12, 24, strtok(mockPrompt, delim), delim, gRenderer, fontTexture);
+  
+  drawTextWithBitmapFont(12, 428, strtok(mockHazardDetails, delim), delim, gRenderer, fontTexture);
 
   strncat(roomTextConcatenated, testMap.displayName, strlen(testMap.displayName));
   strncat(roomTextConcatenated, testMap.textDesc, strlen(testMap.textDesc));
