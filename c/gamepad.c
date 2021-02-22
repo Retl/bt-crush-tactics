@@ -3,6 +3,7 @@
 #include "gamepad.h"
 #include "btct.h"
 
+// Gamepad State. Find some way to wrap this up and pass it around?
 //Analog joystick dead zone
 const int JOYSTICK_DEAD_ZONE = 8000;
 
@@ -17,6 +18,13 @@ int xDir = 0;
 int yDir = 0;
 
 GamepadStatus gamepadStatus;
+
+// End of Gamepad State or something.
+
+GamepadStatus* get_gamepad_status() 
+{
+    return &gamepadStatus;
+}
 
 int mascot_init_gamepad()
 {
@@ -74,6 +82,7 @@ void mascot_update_input_state()
                     {
                         xDir = 0;
                     }
+                    gamepadStatus.stickHorizontal = xDir;
                 }
                 //Y axis motion
                 else if (e.jaxis.axis == 1)
@@ -92,6 +101,7 @@ void mascot_update_input_state()
                     {
                         yDir = 0;
                     }
+                    gamepadStatus.stickVertical = yDir;
                 }
             }
 

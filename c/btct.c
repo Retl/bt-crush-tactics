@@ -3,6 +3,7 @@
 #include "btct.h"
 #include "bitmap_font.h"
 #include "gamepad.h"
+#include "game_object.h"
 
 #include <stdio.h>
 #include <SDL.h>
@@ -26,8 +27,13 @@ SDL_Surface *gScreenSurface;
 SDL_Surface *gSplash;
 SDL_Surface *gCursor;
 SDL_Surface *gFont;
+SDL_Surface *gDefaultSprite;
+
+GamepadStatus* btct_gamepad_status;
 
 SDL_Rect rect = {0, 0, 100, 100};
+
+GameObject game_objects[1];
 
 void update()
 {
@@ -47,6 +53,10 @@ void update()
     else
     {
       handleInput();
+      for (int goNum = 0; goNum < 1; goNum++) 
+      {
+        game_objects[goNum].fun_step(&(game_objects[goNum]));
+      }
       drawSplash();
       drawGameObjects();
     }
@@ -62,6 +72,11 @@ int main()
   printf("Filling the floor.\n");
   mapFillFloor(&testMap, 2);
   mapDebugPrint(&testMap);
+
+  go_init(&(game_objects[0]));
+  go_set_position(&(game_objects[0]), 256, 256);
+  (game_objects[0]).fun_step = &go_step_player_combat_generic;
+
   printf("YEET - Just finished Map Print\n");
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
   {
@@ -125,7 +140,10 @@ void drawGameObjects()
                           "Objective: Reach 100 total popularity before Day 30.\n \n"
                           "<Cassie (Leader) 2 / 6 * - - / - mp - 48 / 50 mv - 256 c - 70 pop>\n";
   char mockHazardDetails[500] = "Mrs. Zhlayer \n0/14 * - 100 / 100 mp \nAction: Laser Recharge \nPosture: Standing \nDistance: 512 px \n\nTitle: Combat Tutor \nCanon: Mascots Aplenty! \n  Sub-Canon: - \nNotoriety: 4444 \nPopularity: -";
-  sprintf(&debugNoteString, "Gamepad Stick Status: (%d, %d) - \n", mascot_first_joystick_silt_horizontal, mascot_first_joystick_silt_vertical);
+  
+  btct_gamepad_status = get_gamepad_status();
+  sprintf(&debugNoteString, "Gamepad Stick Status: (%d, %d) : (%d, %d) - \n", mascot_first_joystick_silt_horizontal, mascot_first_joystick_silt_vertical, 
+    btct_gamepad_status->stickHorizontal, btct_gamepad_status->stickVertical);
 
   // This is the part that was yanked from the SDL1.2 sample I think?
   if (SDL_MUSTLOCK(gScreenSurface))
@@ -176,6 +194,12 @@ void drawGameObjects()
   strncat(roomTextConcatenated, testMap.textContent, strlen(testMap.textContent));
   drawTextWithBitmapFont(12, 290, strtok(roomTextConcatenated, delim), delim, gRenderer, fontTexture);
   //drawTextWithBitmapFont(560, 328, "This\nIs\nA\nTest", delim, gRenderer, fontTexture);
+
+
+  for (int goNum = 0; goNum < 1; goNum++) 
+  {
+    game_objects[goNum].fun_draw(&(game_objects[goNum]), gRenderer);
+  }
 
   SDL_RenderPresent(gRenderer);
 
@@ -371,6 +395,17 @@ int loadMedia()
   {
     printf("Unable to load image %s! SDL Error: %s\n", "img/font_fp.png", SDL_GetError());
     success = 0;
+  }
+
+  gDefaultSprite = IMG_Load("img/temp/unset_sprite.png");
+  if (gDefaultSprite == NULL)
+  {
+    printf("Unable to load image %s! SDL Error: %s\n", "img/temp/unset_sprite.png", SDL_GetError());
+    success = 0;
+  }
+  else 
+  {
+    go_init_default_sprite(gDefaultSprite);
   }
 
   return success;

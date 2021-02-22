@@ -10,7 +10,11 @@ typedef struct {
     int dirHeldLeft;
     int btnHeldSouth;
     int btnHeldEast;
+    int stickHorizontal;
+    int stickVertical;
 } GamepadStatus;
+
+GamepadStatus* get_gamepad_status();
 
 int mascot_init_gamepad();
 void mascot_cleanup_gamepad();
