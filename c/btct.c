@@ -219,7 +219,7 @@ void drawTextWithBitmapFont(int offsetX, int offsetY, char *ptr, char *delim, SD
 
       // We're assuming your texture is from the renderer.
       // The destination and source are for positioning the individual bitmap font characters.
-      SDL_Rect destination = {(currentCol * 8) + offsetX, (currentRow * 8) + offsetY, 8, 8};
+      SDL_Rect destination = {(currentCol * getBitmapFontCharacterWidth()) + offsetX, (currentRow * getBitmapFontCharacterHeight()) + offsetY, getBitmapFontCharacterWidth(), getBitmapFontCharacterHeight()};
       SDL_Rect srcRect = getBitmapFontRectFromCharacter(ptr[i]);
       SDL_RenderCopy(gRenderer, fontTexture, &srcRect, &destination);
 
@@ -390,10 +390,17 @@ int loadMedia()
     success = 0;
   }
 
-  gFont = IMG_Load("img/font_fp.png");
+  /*gFont = IMG_Load("img/font_fp.png");
   if (gFont == NULL)
   {
     printf("Unable to load image %s! SDL Error: %s\n", "img/font_fp.png", SDL_GetError());
+    success = 0;
+  }*/
+
+  gFont = IMG_Load("img/font_fixedsys10x20.png");
+  if (gFont == NULL)
+  {
+    printf("Unable to load image %s! SDL Error: %s\n", "img/font_fixedsys10x20.png", SDL_GetError());
     success = 0;
   }
 
