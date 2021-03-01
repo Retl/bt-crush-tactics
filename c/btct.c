@@ -6,10 +6,19 @@
 #include "game_object.h"
 
 #include <stdio.h>
-#include <SDL.h>
-#include <SDL_image.h>
-#include <emscripten.h>
 #include <stdlib.h>
+
+// For Sleeping: 
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+
+// For Emscripten only: 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 int bQuit = 0;
 int success = 1;
@@ -37,6 +46,7 @@ GameObject game_objects[1];
 
 void update()
 {
+  printf("Update called.\r\n");
   if (bQuit == 1)
   {
     //quit();
@@ -68,31 +78,36 @@ int main()
 {
   mapInit(&testMap, 100, 100);
   mapSetSGRumbleRamble(&testMap);
+  printf("\nBEEP\n");
   mapDebugPrint(&testMap);
-  printf("Filling the floor.\n");
+  printf("\nBEEP-BOOP\n");
+  printf("Filling the floor.\r\n");
   mapFillFloor(&testMap, 2);
   mapDebugPrint(&testMap);
+  printf("Finished Second Map Debug Print.\r\n\r\n");
 
   go_init(&(game_objects[0]));
   go_set_position(&(game_objects[0]), 256, 256);
   (game_objects[0]).fun_step = &go_step_player_combat_generic;
 
-  printf("YEET - Just finished Map Print\n");
+  printf("YEET - Just finished Map Print\r\n");
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
   {
-    printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+    printf("SDL could not initialize! SDL_Error: %s\r\n", SDL_GetError());
     success = 0;
   }
   else
   {
+    #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(update, 0, 0);
+    #endif
 
     // SDL_CreateWindowAndRenderer(480, 270, 0, &gWindow, &gRenderer); // For 8x8 text characters, this is 60 x 33.75 = 1980
     SDL_CreateWindowAndRenderer(1080, 720, 0, &gWindow, &gRenderer); // For 8x8 text characters, 480x270px is 60 x 33.75 = 1980
-    printf("Created window...?.");
+    printf("Created window...?.\r\n");
     if (gWindow == NULL)
     {
-      printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+      printf("Window could not be created! SDL_Error: %s\r\n", SDL_GetError());
       success = 0;
     }
     else
@@ -104,12 +119,21 @@ int main()
 
   //Load media
   loadedMedia = loadMedia();
-  printf("loadMedia: %i\n", loadedMedia);
+  printf("loadMedia: %i\r\n", loadedMedia);
 
   // Init Gamepad
   // https://davidgow.net/handmadepenguin/ch6.html
   mascot_init_gamepad();
 
+printf("About to check for Windows \r\n");
+  #ifdef _WIN32
+  while (bQuit == 0) 
+    {
+      printf("Hi Windows\r\n");
+      update();
+      Sleep(1.0 / 60.0);
+    }
+  #endif
   return 0;
 }
 
@@ -435,6 +459,17 @@ void quit()
   mascot_cleanup_gamepad();
   //Quit SDL subsystems
   SDL_Quit();
+}
+
+int WinMain() 
+{
+    return main();
+}
+
+int DllMain()  // reserved
+{
+  main();
+  return;
 }
 
 /*

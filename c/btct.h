@@ -1,6 +1,10 @@
 #ifndef BTCT_H
 #define BTCT_H
 
+#ifndef __EMSCRIPTEN__
+#define SDL_MAIN_HANDLED
+#endif
+
 #include <SDL.h>
 #include <SDL_image.h>
 #include "map.h"

@@ -17,5 +17,6 @@
 # emcc c/btct.c c/map.c c/bitmap_font.c c/gamepad.c -g -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]' --use-preload-plugins --preload-file img -s FORCE_FILESYSTEM=1 --pre-js js/joystick-preconfig.js -o ./dist/btct.html 
 
 # emcc c/btct.c c/map.c c/bitmap_font.c c/gamepad.c -g -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]' --use-preload-plugins --preload-file img -o ./dist/btct.html
+# cl.exe /Iinclude c/btct.c c/map.c c/bitmap_font.c c/gamepad.c c/game_object.c /link /subsystem:console /LIBPATH:lib/x86 SDL2.lib SDL2_image.lib /out:dist/bin/MascotsAplenty.exe
 
 emcc c/btct.c c/map.c c/bitmap_font.c c/gamepad.c c/game_object.c -g -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]' --use-preload-plugins --preload-file img -o ./dist/btct.html

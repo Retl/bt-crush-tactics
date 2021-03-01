@@ -65,8 +65,8 @@ void mapDebugPrint(Map *map)
 void mapSetSGRumbleRamble(Map *map)
 {
     // https://stackoverflow.com/questions/12179833/assign-string-to-element-in-structure-in-c
-    map->width = 100;
-    map->height = 128;
+    map->width = 20;
+    map->height = 20;
     //mapInit(map, map->width, map->height);
 
     strcpy(map->displayName, "Rumble Ramble-Station\n\n");
