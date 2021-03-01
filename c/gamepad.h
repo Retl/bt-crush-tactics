@@ -15,6 +15,7 @@ typedef struct {
 } GamepadStatus;
 
 GamepadStatus* get_gamepad_status();
+int get_gamepad_quit();
 
 int mascot_init_gamepad();
 void mascot_cleanup_gamepad();

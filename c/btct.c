@@ -134,12 +134,14 @@ printf("About to check for Windows \r\n");
       Sleep(1.0 / 60.0);
     }
   #endif
+  
   return 0;
 }
 
 void handleInput()
 {
   mascot_update_input_state();
+  if (get_gamepad_quit() > 0) {bQuit = 1;}
 }
 
 void setJoystickTilt(int x, int y)

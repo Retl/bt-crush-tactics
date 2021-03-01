@@ -26,6 +26,11 @@ GamepadStatus* get_gamepad_status()
     return &gamepadStatus;
 }
 
+int get_gamepad_quit() 
+{
+    return gamepad_quit;
+}
+
 int mascot_init_gamepad()
 {
     int success = 1;
